@@ -1,0 +1,18 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/alpine
+{
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "antfu.icons-carbon",
+        "antfu.theme-vitesse",
+        "catppuccin.catppuccin-vsc-icons",
+        "github.copilot-chat",
+        "github.copilot",
+        "dbaeumer.vscode-eslint",
+        "usernamehw.errorlens",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  }
+}

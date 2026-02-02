@@ -1,0 +1,14 @@
+{
+  "registryManager": {
+    "npm": {
+      "secretName": "NPM_TOKEN",
+      "policy": {
+        "forceUpdateAll": false,
+        "verifyAuthenticity": true
+      },
+      "allowedRepositories": [
+        "priority-find-up"
+      ]
+    }
+  }
+}
