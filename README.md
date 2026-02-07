@@ -1,21 +1,29 @@
-# NPM Credential Sync
+# @bytriska/scripts
 
-A centralized utility workflow to automate the rotation and synchronization of NPM authentication tokens across your GitHub repositories. 
+A utility tool designed to synchronize repository secrets across multiple repositories.
 
-Instead of manually updating repository secrets in dozens of projects when an NPM token expires, this repository manages the propagation securely via GitHub Actions.
+This tool streamlines the process of setting a specific secret (such as an NPM token) across many repositories simultaneously. Currently, it is optimized for **NPM Token** synchronization. If you require support for other secret types, please feel free to open an issue.
 
-## Key Features
+## Getting Started
 
-* **Automated Propagation**: Updates repository secrets across your entire account or specific target repositories.
-* **Token Validation**: Automatically verifies that the new NPM token is valid (via `npm whoami`) before attempting to sync.
-* **Configurable Scope**: Use `config.json` to switch between updating *all* repositories or a specific allowlist.
-* **Detailed Reporting**: Generates a clear deployment summary in the GitHub Actions UI showing which repos were updated or skipped.
+### 1. Setup Repository
 
-## Configuration
+To use this tool, you can either fork or clone this repository to your own GitHub account.
 
-The behavior of the sync script is controlled entirely by `config.json`.
+```bash
+# Clone the repository
+git clone https://github.com/bytriska/scripts.git
+
+# Or simply click the "Fork" button in the top-right corner of the GitHub UI.
+
+```
+
+### 2. Configuration
+
+Configure the tool by creating or editing the `config.json` file in the root of the workspace. Below is an example configuration:
 
 ```json
+// config.json
 {
   "registryManager": {
     "npm": {
@@ -24,68 +32,42 @@ The behavior of the sync script is controlled entirely by `config.json`.
         "forceUpdateAll": false,
         "verifyAuthenticity": true
       },
-      "allowedRepositories": [
-        "priority-find-up",
-        "my-other-lib"
-      ]
+      "allowedRepositories": ["my-first-repo", "my-second-repo"]
     }
   }
 }
+
 ```
 
-### Configuration Options
+#### Configuration Options
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `secretName` | `string` | The name of the secret key to be created/updated in the target repositories (e.g., `NPM_TOKEN`). |
-| `policy.forceUpdateAll` | `boolean` | If `true`, the token will be pushed to **every** non-archived repository in your account. If `false`, it only updates repos listed in `allowedRepositories`. |
-| `policy.verifyAuthenticity` | `boolean` | If `true`, the workflow attempts to authenticate with the NPM registry using the new token. If validation fails, the workflow stops immediately. |
-| `allowedRepositories` | `array` | A list of exact repository names to update when `forceUpdateAll` is set to `false`. |
+| `secretName` | `string` | The name of the secret key that will be created or updated in the target repositories (e.g., `NPM_TOKEN`). |
+| `policy.forceUpdateAll` | `boolean` | If `true`, the secret will be pushed to **every** non-archived repository in your account.<br>
 
-## Setup & Prerequisites
+<br>If `false`, it only updates repositories explicitly listed in `allowedRepositories`. |
+| `policy.verifyAuthenticity` | `boolean` | If `true`, the workflow attempts to authenticate with the NPM registry using the provided token before syncing. If validation fails, the workflow stops to prevent invalid tokens from being distributed. |
+| `allowedRepositories` | `array` | A list of exact repository names to update. This is only used when `forceUpdateAll` is set to `false`. |
 
-To use this workflow, you need to configure two secrets in **this** repository (`scripts`).
+### 3. Setting Secrets
 
-1. Go to **Settings** > **Secrets and variables** > **Actions**.
-2. Add the following repository secrets:
+Before running the synchronization, you must set the following secrets in the **Settings > Secrets and variables > Actions** menu of *this* repository.
 
 | Secret Name | Description | Required Permissions |
 | --- | --- | --- |
-| **`PAT_TOKEN`** | A GitHub Personal Access Token used to write secrets to *other* repositories. | **Scopes:** `repo` (Full control of private repositories) or `public_repo` (if using only public). |
+| **`PAT_TOKEN`** | A GitHub Personal Access Token (Classic) used to write secrets to your other repositories. | **Scopes:**<br><br>`repo` (Full control of private repositories)<br><br>OR `public_repo` (if syncing only to public repos). |
 | **`NEW_NPM_TOKEN`** | The actual Automation or Publish token generated from npmjs.com. | N/A |
-
-*Note: Fine-grained tokens must have Read/Write access to "Secrets" and "Metadata" on all target repos.* 
 
 ## Usage
 
-This workflow is triggered manually via **Workflow Dispatch**.
+This tool utilizes a **manual trigger** (`workflow_dispatch`). To sync your secrets:
 
-1. Update your `config.json` file if you need to change the target repositories.
-2. Navigate to the **Actions** tab in this repository.
-3. Select **Sync NPM Credentials** from the sidebar.
-4. Click **Run workflow**.
+1. Navigate to the **Actions** tab in this repository.
+2. Select the **Sync NPM Credentials** workflow from the sidebar.
+3. Click the **Run workflow** dropdown button.
+4. Select the branch (usually `main`) and click **Run workflow**.
 
-### Workflow Steps
+### Workflow Summary
 
-1. **Checkout**: Pulls the `scripts` repository.
-2. **Validate**: (If enabled) Checks if `NEW_NPM_TOKEN` is valid.
-3. **Sync**: Iterates through your repositories via GitHub CLI (`gh`).
-4. **Summary**: Outputs a table in the job summary:
-
-## Project Structure
-
-```text
-scripts/
-├── .github/
-│   └── workflows/
-│       └── sync-npm.yml    # The logic for validation and syncing
-├── config.json             # Configuration for policies and allowlists
-└── README.md               # Documentation
-
-```
-
-## Security Note
-
-* **Least Privilege:** Ensure your `PAT_TOKEN` is only used in this repository. Do not share it.
-* **Traceability:** The workflow logs run initiation by `github.actor` for audit purposes.
-* **Logs:** The actual token values are masked by GitHub Actions automatically in the logs.
+Once the job completes, check the **Summary** page of the workflow run. It will provide a table showing which repositories were updated and which were skipped based on your configuration.
