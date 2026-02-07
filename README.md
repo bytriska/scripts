@@ -44,9 +44,7 @@ Configure the tool by creating or editing the `config.json` file in the root of 
 | Option | Type | Description |
 | --- | --- | --- |
 | `secretName` | `string` | The name of the secret key that will be created or updated in the target repositories (e.g., `NPM_TOKEN`). |
-| `policy.forceUpdateAll` | `boolean` | If `true`, the secret will be pushed to **every** non-archived repository in your account.<br>
-
-<br>If `false`, it only updates repositories explicitly listed in `allowedRepositories`. |
+| `policy.forceUpdateAll` | `boolean` | If `true`, the secret will be pushed to **every** non-archived repository in your account.<br><br>If `false`, it only updates repositories explicitly listed in `allowedRepositories`. |
 | `policy.verifyAuthenticity` | `boolean` | If `true`, the workflow attempts to authenticate with the NPM registry using the provided token before syncing. If validation fails, the workflow stops to prevent invalid tokens from being distributed. |
 | `allowedRepositories` | `array` | A list of exact repository names to update. This is only used when `forceUpdateAll` is set to `false`. |
 
